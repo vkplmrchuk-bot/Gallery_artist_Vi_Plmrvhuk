@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: ВАШ_ЛОГІН/НАЗВА_РЕПОЗИТОРІЮ   # <-- змініть
+  repo: vkplmrchuk-bot/Gallery_artist_Vi_Plmrvhuk   # <-- змініть
   branch: main
 
 locale: uk
