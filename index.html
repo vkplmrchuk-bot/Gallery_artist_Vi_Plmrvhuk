@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Галерея митця</title>
+<meta name="description" content="Персональна галерея картин митця">
+<style>
+  :root{--bg:#0f0f10;--panel:#18181a;--text:#ececec;--muted:#9a9a9f;--accent:#e0b46a;--line:#2a2a2e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;line-height:1.6}
+  header{position:sticky;top:0;z-index:10;background:rgba(15,15,16,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:14px 24px;flex-wrap:wrap;gap:10px}
+  .logo{font-size:1.2rem;letter-spacing:.08em}
+  nav{display:flex;gap:6px}
+  nav button{background:none;border:1px solid transparent;color:var(--muted);font:inherit;padding:8px 18px;border-radius:999px;cursor:pointer;transition:.2s}
+  nav button:hover{color:var(--text)}
+  nav button.active{color:var(--bg);background:var(--accent)}
+  main{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+  .tab{display:none}.tab.active{display:block;animation:fade .4s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .hero{display:grid;grid-template-columns:minmax(240px,380px) 1fr;gap:48px;align-items:center}
+  .hero img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:var(--panel)}
+  h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:400;line-height:1.15}
+  .tagline{color:var(--accent);margin:8px 0 24px;font-style:italic}
+  .bio{color:#cfcfd2;white-space:pre-line;font-size:1.05rem}
+  .socials{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+  .socials a{color:var(--text);text-decoration:none;border:1px solid var(--line);background:var(--panel);padding:10px 18px;border-radius:999px;font-family:system-ui,sans-serif;font-size:.92rem;transition:.2s}
+  .socials a:hover{border-color:var(--accent);color:var(--accent)}
+  h2{font-weight:400;font-size:2rem;margin-bottom:28px}
+  .grid{columns:3 280px;column-gap:20px}
+  .card{break-inside:avoid;margin-bottom:20px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;transition:.25s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .card img{width:100%;display:block}
+  .card .meta{padding:14px 16px}
+  .card h3{font-weight:400;font-size:1.1rem}
+  .card small{color:var(--muted);font-family:system-ui,sans-serif}
+  .empty{color:var(--muted);padding:40px 0}
+  #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.94);display:none;z-index:50;overflow:auto;padding:30px 20px}
+  #lightbox.open{display:block}
+  #lightbox .box{max-width:1400px;margin:0 auto}
+  #lightbox img{width:100%;height:auto;max-height:82vh;object-fit:contain;display:block;margin:0 auto}
+  #lightbox .info{max-width:800px;margin:20px auto 0;text-align:center}
+  #lightbox h3{font-weight:400;font-size:1.5rem}
+  #lightbox .sub{color:var(--accent);font-family:system-ui,sans-serif;font-size:.9rem;margin:4px 0 12px}
+  #lightbox p{color:#cfcfd2;white-space:pre-line}
+  #close{position:fixed;top:14px;right:20px;background:none;border:0;color:#fff;font-size:2.2rem;cursor:pointer;z-index:60}
+  footer{border-top:1px solid var(--line);color:var(--muted);text-align:center;padding:24px;font-family:system-ui,sans-serif;font-size:.85rem}
+  @media(max-width:760px){.hero{grid-template-columns:1fr;gap:24px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" id="logo">Галерея</div>
+  <nav>
+    <button class="active" data-tab="home">Головна</button>
+    <button data-tab="gallery">Галерея</button>
+  </nav>
+</header>
+
+<main>
+  <section id="home" class="tab active">
+    <div class="hero">
+      <img id="photo" alt="Фото митця">
+      <div>
+        <h1 id="name"></h1>
+        <p class="tagline" id="tagline"></p>
+        <div class="bio" id="bio"></div>
+        <div class="socials" id="socials"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="tab">
+    <h2>Картини</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer>© <span id="year"></span> <span id="foot-name"></span>. Усі права захищено.</footer>
+
+<div id="lightbox">
+  <button id="close" aria-label="Закрити">×</button>
+  <div class="box">
+    <img id="lb-img" alt="">
+    <div class="info">
+      <h3 id="lb-title"></h3>
+      <div class="sub" id="lb-sub"></div>
+      <p id="lb-desc"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Вкладки
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === id));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+  history.replaceState(null, '', '#' + id);
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+if (location.hash === '#gallery') showTab('gallery');
+
+$('#year').textContent = new Date().getFullYear();
+
+// Дані митця
+fetch('data/artist.json').then(r => r.json()).then(a => {
+  document.title = a.name ? `${a.name} — галерея` : document.title;
+  $('#logo').textContent = a.name || 'Галерея';
+  $('#name').textContent = a.name || '';
+  $('#foot-name').textContent = a.name || '';
+  $('#tagline').textContent = a.tagline || '';
+  $('#bio').textContent = a.bio || '';
+  $('#photo').src = a.photo || 'images/artist-placeholder.svg';
+  const links = [['Instagram', a.instagram], ['TikTok', a.tiktok], ['YouTube', a.youtube], ['Telegram', a.telegram]];
+  $('#socials').innerHTML = links.filter(l => l[1])
+    .map(l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${l[0]}</a>`).join('');
+}).catch(console.error);
+
+// Картини
+let paintings = [];
+fetch('data/paintings.json').then(r => r.json()).then(d => {
+  paintings = d.paintings || [];
+  const grid = $('#grid');
+  if (!paintings.length){ grid.outerHTML = '<p class="empty">Картини скоро з’являться.</p>'; return; }
+  grid.innerHTML = paintings.map((p, i) => `
+    <article class="card" data-i="${i}">
+      <img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">
+      <div class="meta"><h3>${esc(p.title)}</h3><small>${esc([p.year, p.technique].filter(Boolean).join(' · '))}</small></div>
+    </article>`).join('');
+  grid.onclick = e => { const c = e.target.closest('.card'); if (c) openLB(+c.dataset.i); };
+}).catch(console.error);
+
+// Перегляд у повному розмірі (оригінальна якість)
+function openLB(i){
+  const p = paintings[i];
+  $('#lb-img').src = p.image;
+  $('#lb-img').alt = p.title;
+  $('#lb-title').textContent = p.title;
+  $('#lb-sub').textContent = [p.year, p.technique, p.size].filter(Boolean).join(' · ');
+  $('#lb-desc').textContent = p.description || '';
+  $('#lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLB(){ $('#lightbox').classList.remove('open'); document.body.style.overflow = ''; }
+$('#close').onclick = closeLB;
+$('#lightbox').onclick = e => { if (e.target.id === 'lightbox') closeLB(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLB(); });
+</script>
+</body>
+</html>

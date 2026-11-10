@@ -1,0 +1,41 @@
+backend:
+  name: github
+  repo: ВАШ_ЛОГІН/НАЗВА_РЕПОЗИТОРІЮ   # <-- змініть
+  branch: main
+
+locale: uk
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "site"
+    label: "Сайт"
+    files:
+      - name: "artist"
+        label: "Про митця (головна сторінка)"
+        file: "data/artist.json"
+        fields:
+          - { label: "Ім’я", name: "name", widget: "string" }
+          - { label: "Підпис під іменем", name: "tagline", widget: "string", required: false }
+          - { label: "Фото митця", name: "photo", widget: "image" }
+          - { label: "Біографія", name: "bio", widget: "text" }
+          - { label: "Instagram (посилання)", name: "instagram", widget: "string", required: false }
+          - { label: "TikTok (посилання)", name: "tiktok", widget: "string", required: false }
+          - { label: "YouTube (посилання)", name: "youtube", widget: "string", required: false }
+          - { label: "Telegram-канал (посилання)", name: "telegram", widget: "string", required: false }
+
+      - name: "paintings"
+        label: "Картини (галерея)"
+        file: "data/paintings.json"
+        fields:
+          - label: "Картини"
+            name: "paintings"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Назва", name: "title", widget: "string" }
+              - { label: "Зображення (4K)", name: "image", widget: "image" }
+              - { label: "Рік", name: "year", widget: "string", required: false }
+              - { label: "Техніка", name: "technique", widget: "string", required: false }
+              - { label: "Розмір", name: "size", widget: "string", required: false }
+              - { label: "Опис", name: "description", widget: "text", required: false }
