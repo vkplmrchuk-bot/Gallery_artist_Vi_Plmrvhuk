@@ -1,19 +1,12 @@
 {
   "paintings": [
     {
-      "title": "БАЛЕРИНИ",
+      "title": "БАЛЕРИНИ (Ballerinas)",
       "year": "2024",
       "technique": "акрил, двп",
       "size": "20х30",
       "description": "80$",
       "image": "/images/uploads/балерини.jpg"
-    },
-    {
-      "image": "/images/uploads/img_7176.jpeg",
-      "title": "ДНІПРО (Dnipro)",
-      "year": "2024",
-      "technique": "Акрил/полотно на підрамнику",
-      "size": "40/50 см"
     }
   ]
 }
