@@ -94,6 +94,8 @@
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Прибирає початкову "/" зі шляхів до зображень, щоб працювало і на Netlify, і на GitHub Pages
+const asset = p => String(p ?? '').replace(/^\/+/, '');
 
 // Вкладки
 function showTab(id){
@@ -115,7 +117,7 @@ fetch('data/artist.json').then(r => r.json()).then(a => {
   $('#foot-name').textContent = a.name || '';
   $('#tagline').textContent = a.tagline || '';
   $('#bio').textContent = a.bio || '';
-  $('#photo').src = a.photo || 'images/artist-placeholder.svg';
+  $('#photo').src = asset(a.photo) || 'images/artist-placeholder.svg';
   const links = [['Instagram', a.instagram], ['TikTok', a.tiktok], ['YouTube', a.youtube], ['Telegram', a.telegram]];
   $('#socials').innerHTML = links.filter(l => l[1])
     .map(l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${l[0]}</a>`).join('');
@@ -129,7 +131,7 @@ fetch('data/paintings.json').then(r => r.json()).then(d => {
   if (!paintings.length){ grid.outerHTML = '<p class="empty">Картини скоро з’являться.</p>'; return; }
   grid.innerHTML = paintings.map((p, i) => `
     <article class="card" data-i="${i}">
-      <img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy">
+      <img src="${esc(asset(p.image))}" alt="${esc(p.title)}" loading="lazy">
       <div class="meta"><h3>${esc(p.title)}</h3><small>${esc([p.year, p.technique].filter(Boolean).join(' · '))}</small></div>
     </article>`).join('');
   grid.onclick = e => { const c = e.target.closest('.card'); if (c) openLB(+c.dataset.i); };
@@ -138,7 +140,7 @@ fetch('data/paintings.json').then(r => r.json()).then(d => {
 // Перегляд у повному розмірі (оригінальна якість)
 function openLB(i){
   const p = paintings[i];
-  $('#lb-img').src = p.image;
+  $('#lb-img').src = asset(p.image);
   $('#lb-img').alt = p.title;
   $('#lb-title').textContent = p.title;
   $('#lb-sub').textContent = [p.year, p.technique, p.size].filter(Boolean).join(' · ');
