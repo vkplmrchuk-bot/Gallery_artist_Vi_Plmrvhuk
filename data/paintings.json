@@ -7,6 +7,14 @@
       "size": "80 × 60 см",
       "image": "images/sample.svg",
       "description": "Це приклад. Видаліть його в адмін-панелі та додайте свої роботи."
+    },
+    {
+      "title": "БАЛЕРИНИ",
+      "year": "2024",
+      "technique": "акрил, двп",
+      "size": "20х30",
+      "description": "80$",
+      "image": "/images/uploads/балерини.jpg"
     }
   ]
 }
